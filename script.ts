@@ -1,116 +1,150 @@
-const hourlyCharge: HourlyCharge = {
-  lotusWaterPeak: 1.4,
-  luckyWaterPeak: 1.1,
-  lillltWaterPeak: 1.7,
-  lotusWaterNormal: 0.5,
-  luckyWaterNormal: 0.4,
-  lillltWaterNormal: 0.6,
+interface HourlyData{
+  [key: string]: number[]
+};
+const hourlyCharge: HourlyData = {
+"Lotus Water": [1.4,0.5],
+"Lucky Water": [ 1.1, 0.4 ],
+"Water Lilies": [1.7, 0.6 ]
 };
 interface DataPoint {
   timestamp: Date;
   value: number;
 }
 interface VillagerData {
-  name: String;
-  smartMeterId: String;
-  waterVendor: String;
+  name: string;
+  smartMeterId: string;
+  waterVendor: string;
   data: DataPoint[];
-}
-interface HourlyCharge {
-  lotusWaterPeak: number;
-  luckyWaterPeak: number;
-  lillltWaterPeak: number;
-  lotusWaterNormal: number;
-  luckyWaterNormal: number;
-  lillltWaterNormal: number;
 }
 var generateHourlyBasedData = (
   year: number,
   month: number,
   date: number
 ): DataPoint[] => {
-  const data: DataPoint[] = [];
+  const innerData: DataPoint[] = [];
   const startDate = new Date(year, month, date); //Starting reading from specified date
-  startDate.setUTCHours(0); //Starting reading data from 0 hours according to UTC for Starting point
+  startDate.setHours(0); //Starting reading data from 0 hours according to UTC for Starting point
   const endDate = new Date(); //current time
   let currentDate = new Date(); //creating another date object variable
   currentDate = startDate;
   let time = startDate.getHours();
   while (currentDate < endDate) {
-    for (let hour = time; hour < 24; hour++) {
-      const timestamp: Date = currentDate;
-      timestamp.setHours(hour);
+    for (let current_hour = time; current_hour < 24; current_hour++) {
+      currentDate.setHours(current_hour, 0, 0, 0);
+      let timestamp: Date = new Date(currentDate);
       const value = Math.random() * 3;
-      data.push({ timestamp, value });
+      innerData.push({ timestamp, value });
     }
     time = 0;
     currentDate.setDate(currentDate.getDate() + 1);
   }
-  return data;
+  return innerData;
 };
 const villagersData: VillagerData[] = [];
 villagersData.push({
   name: "Ranga",
   smartMeterId: "sm-0",
   waterVendor: "Lotus Water",
-  data: generateHourlyBasedData(2023, 3, 1),
+  data: generateHourlyBasedData(2023, 0, 1),
 });
 villagersData.push({
   name: "Srini",
   smartMeterId: "sm-1",
   waterVendor: "Lucky Water",
-  data: generateHourlyBasedData(2023, 3, 1),
+  data: generateHourlyBasedData(2023, 0, 1),
 });
 villagersData.push({
   name: "Naveen",
   smartMeterId: "sm-2",
   waterVendor: "Water Lilies",
-  data: generateHourlyBasedData(2023, 3, 1),
+  data: generateHourlyBasedData(2023, 0, 1),
 });
-console.log(villagersData);
-/*
-functions need to perform are :
-1. As a villager I want to know how many gallons of water have been used in the past month ?
-2. As a villager I want to know how much cost has been incurred for water usage for the past month? So that I can arrange money to pay the bill.
-3. As a villager I want to know how much cost has been incurred for water usage for the past 1 week? So that I can control my water usage.
-4. As a villager I want to know how many gallons of water used daily wise and cost for the same for a given date range.
-5. As a villager I want to compare prices of all vendors if I use X amount of water in a day. So that I can choose a better and cheaper vendor for my needs.
-6. As a villager I want to set a daily limit to my water usage so that I won't incur too much usage charges.
-*/
-const meterId = prompt("Enter MeterId: ");
+function getDateWiseData(
+  startDate: Date,
+  endDate: Date,
+  villagerData: DataPoint[]
+): Object {
+  let dateData: object = {};
+  for (
+    let currentDate: Date = new Date(startDate);
+    currentDate <= endDate;
+    currentDate.setDate(currentDate.getDate() + 1)
+  ) {
+    const desiredSubObject: Object = villagerData.filter(
+      (obj) => obj.timestamp.getDate() === currentDate.getDate()
+    );
+    dateData[currentDate.toDateString()] = getAddedDateData(desiredSubObject);
+  }
+  return dateData;
+}
+function getAddedDateData(villagerdata: DataPoint[]): number[] {
+  let normalHourWater: number = 0;
+  let peakHourWater: number = 0;
+  const WaterData: DataPoint[] = villagerdata;
+  if (WaterData) {
+    WaterData.forEach((element) => {
+      const { timestamp, value } = element;
+      let current_hour: number = timestamp.getHours();
+      if (current_hour >= 12 && current_hour < 15) {
+        peakHourWater += value;
+      } else {
+        normalHourWater += value;
+      }
+    });
+  }
+  return [normalHourWater, peakHourWater];
+}
+function getPastMonthData(villagerdata: DataPoint[], month: number) {
+  const desiredSubObject = villagerdata.filter(
+    (obj) => obj.timestamp.getMonth() === month
+  );
+  const monthlyData: number[] = getAddedDateData(desiredSubObject);
+  console.log(monthlyData);
+}
+function getOneWeekData(villagerData: DataPoint[]) {
+  let currentDate2: Date = new Date();
+  let startDate2: Date = new Date();
+  currentDate2.setDate(currentDate2.getDate() - 1);
+  startDate2.setDate(startDate2.getDate() - 6);
+  let weekData: number[] = getDateWiseData(
+    startDate2,
+    currentDate2,
+    villagerData
+  );
+  return weekData;
+}
+function getComparisonData(
+  normalHourWater: number,
+  peakHourWater: number
+) {
+  console.log("Villagers costs comparision:\n");
+  for (const villager of villagersData) {
+    console.log(
+      "Villager name:",
+      villager.name,
+      "\n Villager Id:",
+      villager.smartMeterId,
+      "\n Total Cost:",getCost(villager.waterVendor,[normalHourWater,peakHourWater])
+    );
+  }
+}
+function getCost(waterVendor:string,waterData:number[]):number{
+  return(hourlyCharge[waterVendor][1]*waterData[1]+hourlyCharge[waterVendor][0]*waterData[0])
+}
+const prompt = require("prompt-sync")();
+const meterId = prompt("Enter something: ");
 const desiredObject = villagersData.find((obj) => obj.smartMeterId === meterId);
-console.log(
-  "Inputs for functions to performs:\n1. To get past month data\n2. To get cost for past month.\n3. Show incured cost of past one week.\n4. To get daily wise data.\n5. To compare prices 6.To set daily water limit.\n any thing else to exit"
-);
-const functionInput = prompt(
-  "Enter option based on functionality required based on above data:"
-);
-/*switch(functionInput) { 
-  case "1": { 
-    getPastMonthData(desiredObject);
-     break; 
-  } 
-  case "2": { 
-     getPastMonthCost(desiredObject);
-     break; 
-  } 
-  case "3": { 
-    getPastWeekCost(desiredObject);
-    break; 
- } 
- case "4": { 
-    getDailyWiseData(desiredObject);
-    break; 
- } 
- case "5": {
-  comparePrices(desiredObject,villagersData);
-  break; 
-} 
-case "6": { 
-  limitWaterUsage(villagersData,meterId);
-  break; 
-} 
-  default: { 
-   console.log("Entered wrong inputs!\n exit");
-  } 
-} */
+const startDate1 = new Date(2023, 4, 19);
+const endDate1 = new Date();
+const pastMonth = new Date().setMonth(endDate1.getMonth() - 1);
+const dailyData = getDateWiseData(startDate1, endDate1, desiredObject.data);
+const month = endDate1.getMonth() - 1;
+console.log("Past Month Data:\n");
+getPastMonthData(desiredObject?.data, month);
+const oneWeekData: number[] = getOneWeekData(desiredObject?.data);
+console.log("Weekly Data:\n");
+console.log(oneWeekData);
+console.log("Daily wise data:");
+console.log(dailyData);
+console.log("Cost comparision:\n");
+getComparisonData(20,30);
