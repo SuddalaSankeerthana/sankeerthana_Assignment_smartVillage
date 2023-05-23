@@ -25,7 +25,7 @@ var generateHourlyBasedData = (
 ):DataPoint[]=> {
   const eachVillagerAquaData: DataPoint[] = [];
   const dataStartDate = new Date(year, month, date);
-  dataStartDate.setHours(5);
+  dataStartDate.setHours(0);
   const dataEndDate = new Date();
   let dataCurrentDate = new Date();
   dataCurrentDate = dataStartDate;
@@ -74,7 +74,7 @@ function getDateWiseData(
     currentDate.setDate(currentDate.getDate() + 1)
   ) {
     const villagerDateData: DataPoint[] | undefined = villagerData.filter(
-      (obj) => obj.timestamp === currentDate
+      (obj) => obj.timestamp.toLocaleDateString() ===currentDate.toLocaleDateString()
     );
     if(villagerDateData){
     villagerDateObject[currentDate.toDateString()] = getAddedDateData(villagerDateData);
@@ -98,22 +98,22 @@ function getAddedDateData(villagerData: DataPoint[]): number[] {
   }
   return [normalHourWater, peakHourWater];
 }
-function getPastMonthData(villagerData: DataPoint[], month: number) {
+function getPastMonthData(villagerData: DataPoint[], month: number):number[] {
   const villagerMonthData = villagerData.filter(
-    (obj) => obj.timestamp.getMonth() === month
+    (obj) => obj.timestamp.getMonth()===month && obj.timestamp.getFullYear()===endDate.getFullYear()
   );
   const monthlyData: number[] = getAddedDateData(villagerMonthData);
   return monthlyData;
 }
-function getWeeklyWiseData(villagerData: DataPoint[]) {
+function getWeeklyWiseData(villagerData: DataPoint[]):object {
   let weekCurrentDate: Date = new Date();
   let weekStartDate: Date = new Date();
   weekCurrentDate.setDate(weekCurrentDate.getDate() - 1);
   weekStartDate.setDate(weekStartDate.getDate() - 7);
   const weeklyData:object=getDateWiseData(weekStartDate, weekCurrentDate, villagerData);
-  return weeklyData
+  return weeklyData;
 }
-function getCost(waterData: number[], waterVendor: string) {
+function getCost(waterData: number[], waterVendor: string):number{
   return (
     waterData[0] * hourlyCharge[waterVendor][0] +
     waterData[1] * hourlyCharge[waterVendor][1]
@@ -143,7 +143,6 @@ if (villagerSubObject != undefined) {
     villagerSubObject.data,
     month
   );
-  console.log(villagerSubObject.data);
   console.log(
     "Hello ",
     villagerSubObject?.name,
@@ -154,7 +153,7 @@ if (villagerSubObject != undefined) {
   console.log(
     "Available services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
   );
-  let option = prompt("Enter 0 to 5: ");
+  let option = prompt("Enter 0 to 5 to get service: ");
   while (option) {
     if (option=="1") {
       console.log(
@@ -192,7 +191,6 @@ if (villagerSubObject != undefined) {
       let rangeStartDate: Date = new Date(dateString);
       dateString = prompt("Enter Ending date(YYYT-MM-DD):");
       let rangeEndDate: Date = new Date(dateString);
-      console.log(rangeStartDate,rangeEndDate);
       let sum: number = 0;
       const dailyData = getDateWiseData(
         rangeStartDate,
@@ -201,7 +199,7 @@ if (villagerSubObject != undefined) {
       );
       if (dailyData) {
         console.log("Date Wise Data:");
-        for (const [key, value] of Object.entries(dailyData)) {
+        for (const [key,value] of Object.entries(dailyData)) {
           let dailyCostSum = 0;
           dailyCostSum = getCost(value, villagerSubObject.waterVendor);
           sum += dailyCostSum;
@@ -226,13 +224,13 @@ if (villagerSubObject != undefined) {
       let normal = prompt("Enter normal hour water usage:");
       getComparisionOfCost(hourlyCharge, [peak, normal]);
     } else if (option == "0") {
-      console.log(villagerSubObject.name,",thank you!");
+      console.log("Thank you!");
       break;
     }
 else{
   console.log("Sorry,You Entered Wrong option.0,1,2,3,4,5 only these options are avilable.\nEnter again");
 }
-option = prompt("Enter 0 to 5: ");}}
+option = prompt("Enter 0 to 5 to get service: ");}}
 else {
   console.log("Sorry,You Entered Wrong details.\n Thank you!");
 }
