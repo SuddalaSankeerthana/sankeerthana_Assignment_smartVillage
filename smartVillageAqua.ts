@@ -62,7 +62,6 @@ villagersData.push({
   waterVendor: "Water Lilies",
   data: generateHourlyBasedData(2023,0,1),
 });
-// function generates Date wise data stores as form starting data to ending date, dates are are keys and mapped with water usage [peak,norma] array
 function getDateWiseData(
   rangeStartDate: Date,
   rangeEndDate: Date,
@@ -82,7 +81,6 @@ function getDateWiseData(
   }}
   return villagerDateObject;
 }
-// This function returns added sum of water for peak hours and normal hours [peak,normal]
 function getAddedDateData(villagerData: DataPoint[]): number[] {
   let normalHourWater: number = 0;
   let peakHourWater: number = 0;
@@ -100,7 +98,6 @@ function getAddedDateData(villagerData: DataPoint[]): number[] {
   }
   return [normalHourWater, peakHourWater];
 }
-// This function will show the past month water used in peak and normal hours 
 function getPastMonthData(villagerData: DataPoint[], month: number):number[] {
   const villagerMonthData = villagerData.filter(
     (obj) => obj.timestamp.getMonth()===month && obj.timestamp.getFullYear()===endDate.getFullYear()
@@ -108,7 +105,6 @@ function getPastMonthData(villagerData: DataPoint[], month: number):number[] {
   const monthlyData: number[] = getAddedDateData(villagerMonthData);
   return monthlyData;
 }
-// This function generates start date and end dates for the week and passes to getDateWiseData 
 function getWeeklyWiseData(villagerData: DataPoint[]):object {
   let weekCurrentDate: Date = new Date();
   let weekStartDate: Date = new Date();
@@ -117,14 +113,12 @@ function getWeeklyWiseData(villagerData: DataPoint[]):object {
   const weeklyData:object=getDateWiseData(weekStartDate, weekCurrentDate, villagerData);
   return weeklyData;
 }
-// This function performs cost caluculation
 function getCost(waterData: number[], waterVendor: string):number{
   return (
     waterData[0] * hourlyCharge[waterVendor][0] +
     waterData[1] * hourlyCharge[waterVendor][1]
   );
 }
-//This function compares the cost for different vendors
 function getComparisionOfCost(hourlyCharge, waterData: number[]) {
   console.log(
     "Comparision of data:\nNormal hour water:",
@@ -157,7 +151,7 @@ if (villagerSubObject != undefined) {
     "\nVendor type:",villagerSubObject.waterVendor
   );
   console.log(
-    "Available services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
+    "Note: Data is available from starting of this year.\nAvailable services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
   );
   let option = prompt("Enter 0 to 5 to get service: ");
   while (option) {
@@ -238,7 +232,6 @@ else{
 }
 option = prompt("Enter 0 to 5 to get service: ");}}
 else {
-  console.log("Sorry,You Entered Wrong details.\n Thank you!");
+  console.log("Sorry,You Entered Wrong details.\nThank you!");
 }
-
 
