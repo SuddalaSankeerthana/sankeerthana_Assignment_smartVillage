@@ -14,7 +14,7 @@ For running the application the requirements are:
 ```
 npm install
 ```
--Install TypeScript compiler.
+- Install TypeScript compiler.
 
 [https://www.typescriptlang.org/download](url)
 
@@ -28,7 +28,7 @@ To use follow the below steps:
 ```
 tsc smartVillageAqua.ts
 ```
--Run the smartVillageAqua.js
+- Run the smartVillageAqua.js
 ```
 node smartVillageAqua.js
 ```
