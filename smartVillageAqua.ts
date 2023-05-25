@@ -37,7 +37,10 @@ var generateHourlyBasedData = (
       let timestamp: Date = new Date(dataCurrentDate);
       const value = Math.random() * 2;
       eachVillagerAquaData.push({ timestamp, value });
-      }}
+      }
+    else{
+      break;
+    }}
     time = 0;
     dataCurrentDate.setDate(dataCurrentDate.getDate() + 1);
   }
@@ -151,7 +154,7 @@ if (villagerSubObject != undefined) {
     "\nVendor type:",villagerSubObject.waterVendor
   );
   console.log(
-    "Note: Data is available from starting of this year.\nAvailable services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
+    "Note: Data availabel from starting of this year.\nAvailable services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
   );
   let option = prompt("Enter 0 to 5 to get service: ");
   while (option) {
