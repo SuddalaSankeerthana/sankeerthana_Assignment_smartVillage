@@ -8,15 +8,10 @@ Rangasthalam is the smart village contains 3 members of water user.The entire vi
 This application provides monitering and controlling capabilities to the water usage for the villagers.
 - This project contains recorded data from the starting of this year for 3 villager.
 ## Installation
-For running the application the requirements are:
-- Text Editor or IDE
-- Download and install the NodeJS framework onto your computer system.To install go through [https://nodejs.org/en/download/package-manager](url)
+- Install TypeScript globally by running the following command
 ```
-npm install
+npm install -g typescript
 ```
-- Install TypeScript compiler.
-
-[https://www.typescriptlang.org/download](url)
 
 - You need to install prompt-sync for running this application.
 ```
@@ -24,10 +19,16 @@ npm install sync-promp
 ```
 ## Usage
 To use follow the below steps:
+- clone the repository by running the following command
+```
+git clone https://github.com/everest-engineering/sankeerthana_Assignment_smartVillage.git
+```
 - Run the smartVillageAqua.ts
 ```
 tsc smartVillageAqua.ts
 ```
+- Data is generated from starting of this year in villagerdata.json by running hourlyData.ts.
+- Import the downloded data by choosing the path
 - Run the smartVillageAqua.js
 ```
 node smartVillageAqua.js
