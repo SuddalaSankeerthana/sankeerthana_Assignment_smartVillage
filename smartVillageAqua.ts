@@ -7,7 +7,7 @@ interface TypeHourData {
   peak: number;
   normal: number;
 }
-interface StringDateData {
+interface CombinedWaterConsumption {
   [Date: string]: number[];
 }
 const hourlyCharge: HourlyCharge = {
@@ -29,8 +29,8 @@ function getDateWiseData(
   rangeStartDate: Date,
   rangeEndDate: Date,
   villagerData: DataPoint[]
-): StringDateData {
-  let villagerDateObject: StringDateData = {};
+):CombinedWaterConsumption {
+  let villagerDateObject: CombinedWaterConsumption = {};
   for (
     let currentDate: Date = new Date(rangeStartDate);
     currentDate <= rangeEndDate;
@@ -42,12 +42,12 @@ function getDateWiseData(
     );
     if (villagerDateData) {
       villagerDateObject[currentDate.toDateString()] =
-        getAddedDateData(villagerDateData);
+      getCombinedWaterConsumption(villagerDateData);
     }
   }
   return villagerDateObject;
 }
-function getAddedDateData(villagerData: DataPoint[]): number[] {
+function getCombinedWaterConsumption(villagerData: DataPoint[]): number[] {
   let normalHourWater: number = 0;
   let peakHourWater: number = 0;
   const WaterData: DataPoint[] = villagerData;
@@ -68,15 +68,15 @@ function getPastMonthData(villagerData: DataPoint[], month: number): number[] {
       obj.timestamp.getMonth() === month &&
       obj.timestamp.getFullYear() === endDate.getFullYear()
   );
-  const monthlyData: number[] = getAddedDateData(villagerMonthData);
+  const monthlyData: number[] = getCombinedWaterConsumption(villagerMonthData);
   return monthlyData;
 }
-function getWeeklyWiseData(villagerData: DataPoint[]): StringDateData {
+function getWeeklyWiseData(villagerData: DataPoint[]): CombinedWaterConsumption {
   let weekCurrentDate: Date = new Date();
   let weekStartDate: Date = new Date();
   weekCurrentDate.setDate(weekCurrentDate.getDate() - 1);
   weekStartDate.setDate(weekStartDate.getDate() - 7);
-  const weeklyData: StringDateData = getDateWiseData(
+  const weeklyData: CombinedWaterConsumption = getDateWiseData(
     weekStartDate,
     weekCurrentDate,
     villagerData
