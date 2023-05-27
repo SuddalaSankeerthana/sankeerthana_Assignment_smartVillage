@@ -89,7 +89,7 @@ function getCost(waterData: number[], waterVendor: string): number {
     waterData[1] * hourlyCharge[waterVendor].normal
   );
 }
-function getComparisionOfCostData(hourlyCharge, waterData: number[]):[string,number][]
+function getComparisionOfCostData(hourlyCharge:HourlyCharge, waterData: number[]):[string,number][]
 {let priceObject:object = {};
   for (const vendor of Object.keys(hourlyCharge)) {
   priceObject[vendor] = getCost(waterData, vendor);
@@ -97,7 +97,7 @@ function getComparisionOfCostData(hourlyCharge, waterData: number[]):[string,num
 let entries:[string,number][]= Object.entries(priceObject).sort((a, b) => a[1] - b[1]);// sorting based on the values 
 return entries
 }
-function showComparisionOfCost(hourlyCharge) {
+function showComparisionOfCost(hourlyCharge:HourlyCharge) {
   console.log(
     "........You requested for Comparision of vendor prices........"
   );
