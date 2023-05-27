@@ -37,14 +37,7 @@ var generateHourlyBasedData = (
   }
   return eachVillagerAquaData;
 };
-const villagerDataString:string=fs.readFileSync(
-    "/Users/sankeerthana/Desktop/typescript/test/json3.json",
-    "utf-8"
-  );;
-const villagersData: VillagerData[] =fs.readFileSync(
-    "/Users/sankeerthana/Desktop/typescript/test/json3.json",
-    "utf-8"
-  );;
+const villagersData: VillagerData[] =[]
 villagersData.push({
   name: "Ranga",
   smartMeterId: "sm-0",
