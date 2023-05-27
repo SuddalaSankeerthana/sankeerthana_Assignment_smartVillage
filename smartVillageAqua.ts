@@ -1,12 +1,19 @@
 import { type } from "os";
-
-type HourlyCharge = {
-  [key: string]: number[];
-};
+import * as fs from "fs";
+interface HourlyCharge {
+  [vender: string]: hourData;
+}
+interface hourData {
+  peak: number;
+  normal: number;
+}
+interface DateData {
+  [Date: string]: number[];
+}
 const hourlyCharge: HourlyCharge = {
-  "Lotus Water": [1.4, 0.5],
-  "Lucky Water": [1.1, 0.4],
-  "Water Lilies": [1.7, 0.6],
+  "Lotus Water": { peak: 1.4, normal: 0.5 },
+  "Lucky Water": { peak: 1.1, normal: 0.4 },
+  "Water Lilies": { peak: 1.7, normal: 0.6 },
 };
 interface DataPoint {
   timestamp: Date;
@@ -18,59 +25,12 @@ interface VillagerData {
   waterVendor: string;
   data: DataPoint[];
 }
-var generateHourlyBasedData = (
-  year: number,
-  month: number,
-  date: number
-): DataPoint[] => {
-  const eachVillagerAquaData: DataPoint[] = [];
-  const dataStartDate = new Date(year, month, date);
-  dataStartDate.setHours(0);
-  const dataEndDate = new Date();
-  let dataCurrentDate = new Date();
-  dataCurrentDate = dataStartDate;
-  let time = dataStartDate.getHours();
-  while (dataCurrentDate < dataEndDate) {
-    for (let current_hour = time; current_hour < 24; current_hour++) {
-      if (dataCurrentDate < dataEndDate) {
-        dataCurrentDate.setHours(current_hour, 0, 0, 0);
-        let timestamp: Date = new Date(dataCurrentDate);
-        const value = Math.random() * 2;
-        eachVillagerAquaData.push({ timestamp, value });
-      } else {
-        break;
-      }
-    }
-    time = 0;
-    dataCurrentDate.setDate(dataCurrentDate.getDate() + 1);
-  }
-  return eachVillagerAquaData;
-};
-const villagersData: VillagerData[] = [];
-villagersData.push({
-  name: "Ranga",
-  smartMeterId: "sm-0",
-  waterVendor: "Lotus Water",
-  data: generateHourlyBasedData(2023, 0, 1),
-});
-villagersData.push({
-  name: "Srini",
-  smartMeterId: "sm-1",
-  waterVendor: "Lucky Water",
-  data: generateHourlyBasedData(2023, 0, 1),
-});
-villagersData.push({
-  name: "Naveen",
-  smartMeterId: "sm-2",
-  waterVendor: "Water Lilies",
-  data: generateHourlyBasedData(2023, 0, 1),
-});
 function getDateWiseData(
   rangeStartDate: Date,
   rangeEndDate: Date,
   villagerData: DataPoint[]
-): object {
-  let villagerDateObject: object = {};
+): DateData {
+  let villagerDateObject: DateData = {};
   for (
     let currentDate: Date = new Date(rangeStartDate);
     currentDate <= rangeEndDate;
@@ -91,17 +51,15 @@ function getAddedDateData(villagerData: DataPoint[]): number[] {
   let normalHourWater: number = 0;
   let peakHourWater: number = 0;
   const WaterData: DataPoint[] = villagerData;
-  if (WaterData) {
-    WaterData.forEach((element) => {
-      const { timestamp, value } = element;
-      let current_hour: number = timestamp.getHours();
-      if (current_hour >= 12 && current_hour < 15) {
-        peakHourWater += value;
-      } else {
-        normalHourWater += value;
-      }
-    });
-  }
+  WaterData.forEach((element) => {
+    const { timestamp, value } = element;
+    let current_hour: number = timestamp.getHours();
+    if (current_hour >= 12 && current_hour < 15) {
+      peakHourWater += value;
+    } else {
+      normalHourWater += value;
+    }
+  });
   return [normalHourWater, peakHourWater];
 }
 function getPastMonthData(villagerData: DataPoint[], month: number): number[] {
@@ -113,12 +71,12 @@ function getPastMonthData(villagerData: DataPoint[], month: number): number[] {
   const monthlyData: number[] = getAddedDateData(villagerMonthData);
   return monthlyData;
 }
-function getWeeklyWiseData(villagerData: DataPoint[]): object {
+function getWeeklyWiseData(villagerData: DataPoint[]): DateData {
   let weekCurrentDate: Date = new Date();
   let weekStartDate: Date = new Date();
   weekCurrentDate.setDate(weekCurrentDate.getDate() - 1);
   weekStartDate.setDate(weekStartDate.getDate() - 7);
-  const weeklyData: object = getDateWiseData(
+  const weeklyData: DateData = getDateWiseData(
     weekStartDate,
     weekCurrentDate,
     villagerData
@@ -127,8 +85,8 @@ function getWeeklyWiseData(villagerData: DataPoint[]): object {
 }
 function getCost(waterData: number[], waterVendor: string): number {
   return (
-    waterData[0] * hourlyCharge[waterVendor][0] +
-    waterData[1] * hourlyCharge[waterVendor][1]
+    waterData[0] * hourlyCharge[waterVendor].peak +
+    waterData[1] * hourlyCharge[waterVendor].normal
   );
 }
 function getComparisionOfCost(hourlyCharge, waterData: number[]) {
@@ -138,9 +96,9 @@ function getComparisionOfCost(hourlyCharge, waterData: number[]) {
     "\nPeak hour water:",
     waterData[0]
   );
-  for (const key of Object.keys(hourlyCharge)) {
-    let cost = getCost(waterData, key);
-    console.log("Vendor Name:", key, "\nPrice:", cost);
+  for (const vender of Object.keys(hourlyCharge)) {
+    let cost = getCost(waterData, vender);
+    console.log("Vendor Name:", vender, "\nPrice:", cost);
   }
 }
 function showPastMonthData(pastMonthData: number[]) {
@@ -155,7 +113,7 @@ function showPastMonthData(pastMonthData: number[]) {
     pastMonthData[1]
   );
 }
-function showPastMonthCost(villagerSubObject: VillagerData) {
+function showPastMonthCost(pastMonthData:number[],villagerSubObject: VillagerData) {
   console.log(
     "........You requested for Past month water Price costed........"
   );
@@ -168,7 +126,6 @@ function showPastWeekData(villagerSubObject: VillagerData) {
   console.log("........You requested for Past one week data........");
   const weekWaterData: Object = getWeeklyWiseData(villagerSubObject.data);
   let total: number = 0;
-  if (weekWaterData)
     for (const ele of Object.values(weekWaterData)) {
       total += getCost(ele, villagerSubObject.waterVendor);
     }
@@ -186,17 +143,16 @@ function showDailyWiseData(villagerSubObject: VillagerData) {
     rangeEndDate,
     villagerSubObject.data
   );
-  if (dailyData) {
     console.log("Date Wise Data:");
-    for (const [key, value] of Object.entries(dailyData)) {
+    for (const [date, data] of Object.entries(dailyData)) {
       let dailyCostSum = 0;
-      dailyCostSum = getCost(value, villagerSubObject.waterVendor);
+      dailyCostSum = getCost(data, villagerSubObject.waterVendor);
       sum += dailyCostSum;
       let dailyWaterUsage = 0;
-      dailyWaterUsage = value[0] + value[1];
+      dailyWaterUsage = data[0] + data[1];
       console.log(
         "Date:",
-        key,
+        date,
         "\nWater used:",
         dailyWaterUsage,
         "Water cost:",
@@ -204,62 +160,91 @@ function showDailyWiseData(villagerSubObject: VillagerData) {
       );
     }
     console.log("Total Cost:", sum);
+}
+function readJsonData(fileName:string,filePath:string):VillagerData[]{
+  const villagerDataString = fs.readFileSync(filePath + fileName, "utf-8");
+  let villagersData: VillagerData[] = JSON.parse(villagerDataString);
+  villagersData.forEach((villager) => {
+    villager.data.forEach((element) => {
+      element.timestamp = new Date(element.timestamp);
+    });
+  });
+  return villagersData;}
+function quairyVendor(){
+  while (villagerSubObject == undefined) {
+    console.log("Entered wrong details or if dont want services enter 0 ");
+    meterId = prompt("Enter Id agin: ");
+    if (meterId == 0) {
+      console.log("Exited, Thank You");
+      break;
+    }}
+}
+function showDetailsToVendor(){
+    if(villagerSubObject){
+      console.log(
+        "Hello ",
+        villagerSubObject.name,
+        "\nYour Id:",
+        villagerSubObject.smartMeterId,
+        "\nVendor type:",
+        villagerSubObject.waterVendor
+      );
+      console.log(
+        "Note: Data availabel from starting of this year.\nAvailable services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
+      );
   }
 }
-function showComparisionData() {
-  console.log("........You requested for Comparision of vendor prices........");
-  let peak = prompt("Enter Peak hour water usage:");
-  let normal = prompt("Enter normal hour water usage:");
-  getComparisionOfCost(hourlyCharge, [peak, normal]);
+function performActions(villagerSubObject:VillagerData){
+    const month = endDate.getMonth() - 1;
+    const pastMonthData: number[] = getPastMonthData(villagerSubObject.data, month);
+  while (true) {
+    if (option == "0") {
+      console.log("Thank You");
+      break;
+    }
+    if (option == "1") {
+      showPastMonthData(pastMonthData);
+    } else if (option == "2") {
+      showPastMonthCost(pastMonthData,villagerSubObject);
+    } else if (option == "3") {
+      showPastWeekData(villagerSubObject);
+    } else if (option === "4") {
+      showDailyWiseData(villagerSubObject);
+    } else if (option === "5") {
+      console.log(
+        "........You requested for Comparision of vendor prices........"
+      );
+      let peak = prompt("Enter Peak hour water usage:");
+      let normal = prompt("Enter normal hour water usage:");
+      getComparisionOfCost(hourlyCharge, [peak, normal]);
+    } else if (!option) {
+      console.log("Enter anything, it can't be empty");
+    } else {
+      console.log(
+        "Sorry,You Entered Wrong option.1,2,3,4,5 only these options are avilable.\nEnter again or to exit enter 0"
+      );
+    }
+    option = prompt("Enter 0 to 5 to get service: ");
+  }
 }
+var filePath = "/Users/sankeerthana/Desktop/typescript/smart_village/";
+var fileName = "villagersdata.json";
+const villagersData=readJsonData(fileName,filePath);
 const prompt = require("prompt-sync")();
 let meterId = prompt("Enter Id: ");
-let villagerSubObject = villagersData.find(
-  (obj) => obj.smartMeterId === meterId
+const endDate=new Date();
+const villagerSubObject = villagersData.find(
+  (obj) => obj.smartMeterId ==  meterId
 );
-const endDate = new Date();
 while (villagerSubObject == undefined) {
-  console.log("Enter wrong details");
+  console.log("Entered wrong details or if dont want services enter 0 ");
   meterId = prompt("Enter Id agin: ");
-  villagerSubObject = villagersData.find((obj) => obj.smartMeterId === meterId);
-}
-const month = endDate.getMonth() - 1;
-const pastMonthData: number[] = getPastMonthData(villagerSubObject.data, month);
-console.log(
-  "Hello ",
-  villagerSubObject.name,
-  "\nYour Id:",
-  villagerSubObject.smartMeterId,
-  "\nVendor type:",
-  villagerSubObject.waterVendor
-);
-console.log(
-  "Note: Data availabel from starting of this year.\nAvailable services:\n1.You can get Past month gallons of water usage.\n2.You can get Past month water cost.\n3.You can get total cost for past one week.\n4.You can get gallons of water used daily wise and cost for the same date.\n5.You can compare prices for all the vendors\n0.For exit"
-);
-let option = prompt("Enter 0 to 5 to get service: ");
-while (true) {
-  if(option=="0"){
-    console.log("Thank You");
+  if (meterId == 0) {
+    console.log("Exited, Thank You");
     break;
-  }
-  if (option == "1") {
-    showPastMonthData(pastMonthData);
-  } else if (option == "2") {
-    showPastMonthCost(villagerSubObject);
-  } else if (option == "3") {
-    showPastWeekData(villagerSubObject);
-  } else if (option === "4") {
-    showDailyWiseData(villagerSubObject);
-  } else if (option === "5") {
-    showComparisionData();
-  } 
-  else if(!option){
-    console.log("Enter anything, it can't be empty");
-  }
-  else{
-    console.log(
-      "Sorry,You Entered Wrong option.1,2,3,4,5 only these options are avilable.\nEnter again or to exit enter 0"
-    );
-  }
-  option = prompt("Enter 0 to 5 to get service: ");
+  }}
+showDetailsToVendor()
+let option = prompt("Enter 0 to 5 to get service: ");
+if(villagerSubObject){
+performActions(villagerSubObject)
 }
