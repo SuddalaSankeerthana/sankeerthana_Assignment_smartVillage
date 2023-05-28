@@ -218,9 +218,9 @@ function performActions(villagerSubObject: VillagerData) {
       showPastMonthCost(pastMonthData, villagerSubObject);
     } else if (option == "3") {
       showPastWeekData(villagerSubObject);
-    } else if (option === "4") {
+    } else if (option == "4") {
       showDailyWiseData(villagerSubObject);
-    } else if (option === "5") {
+    } else if (option == "5") {
       showComparisionOfCost(hourlyCharge);
     } else if (!option) {
       console.log("Enter anything, it can't be empty");
