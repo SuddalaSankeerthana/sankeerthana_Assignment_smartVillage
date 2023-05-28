@@ -186,16 +186,6 @@ function readJsonData(fileName: string, filePath: string): VillagerData[] {
   });
   return villagersData;
 }
-function quairyVendor() {
-  while (villagerSubObject == undefined) {
-    console.log("Entered wrong details or if dont want services enter 0 ");
-    meterId = prompt("Enter Id agin: ");
-    if (meterId == 0) {
-      console.log("Exited, Thank You");
-      break;
-    }
-  }
-}
 function showDetailsToVendor() {
   if (villagerSubObject) {
     console.log(
