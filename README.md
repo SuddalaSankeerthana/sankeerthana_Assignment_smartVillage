@@ -13,7 +13,7 @@ This application provides monitering and controlling capabilities to the water u
 npm install -g typescript
 ```
 
-- You need to install prompt-sync for running this application.
+- You need to save prompt-sync dependencie for running this application.
 ```
 npm install --save prompt-sync
 ```
