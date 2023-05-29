@@ -249,8 +249,9 @@ while (villagerSubObject == undefined) {
     break;
   }
 }
+// let option = prompt("Enter 0 to 5 to get service: ");
 showDetailsToVendor();
-let option = prompt("Enter 0 to 5 to get service: ");
 if (villagerSubObject) {
+  var option = prompt("Enter 0 to 5 to get service: ");
   performActions(villagerSubObject);
 }
