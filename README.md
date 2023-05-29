@@ -15,7 +15,7 @@ npm install -g typescript
 
 - You need to install prompt-sync for running this application.
 ```
-npm install sync-promp
+npm install --save prompt-sync
 ```
 ## Usage
 To use follow the below steps:
