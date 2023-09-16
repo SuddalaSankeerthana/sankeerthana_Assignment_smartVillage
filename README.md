@@ -8,6 +8,10 @@ Rangasthalam is the smart village contains 3 members of water user.The entire vi
 This application provides monitering and controlling capabilities to the water usage for the villagers.
 - This project contains recorded data from the starting of this year for 3 villager.
 ## Installation
+- Initiaize package.json.
+ ```
+  npm init -y
+  ```
 - Install TypeScript globally by running the following command
 ```
 npm install -g typescript
