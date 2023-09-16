@@ -14,12 +14,12 @@ This application provides monitering and controlling capabilities to the water u
   ```
 - Install TypeScript globally by running the following command
 ```
-npm install -g typescript
+npm install  typescript
 ```
 
 - You need to save prompt-sync dependencie for running this application.
 ```
-npm install --save prompt-sync
+npm install prompt-sync
 ```
 ## Usage
 To use follow the below steps:
